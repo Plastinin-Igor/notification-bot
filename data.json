@@ -1,0 +1,42 @@
+[
+  {
+    "typeNotify": "EVENT",
+    "dateNotify": "2025-10-15",
+    "timeNotify": "18:30:00",
+    "dayOfWeekNotify": "WEDNESDAY",
+    "nameNotify": "Встреча сотрудников",
+    "textNotify": "Приглашаем всех сотрудников на встречу.",
+    "users": [
+      {
+        "userId": 1,
+        "userName": "Ivanov",
+        "fullName": "Иван Иванов"
+      },
+      {
+        "userId": 2,
+        "userName": "Petrov",
+        "fullName": "Петр Петров"
+      }
+    ]
+  },
+  {
+    "typeNotify": "EVENT",
+    "dateNotify": "2025-10-16",
+    "timeNotify": "18:30:00",
+    "dayOfWeekNotify": "WEDNESDAY",
+    "nameNotify": "Встреча ветеранов",
+    "textNotify": "Приглашаем всех ветеранов на встречу.",
+    "users": [
+      {
+        "userId": 1,
+        "userName": "Ivanov",
+        "fullName": "Иван Иванов"
+      },
+      {
+        "userId": 2,
+        "userName": "Petrov",
+        "fullName": "Петр Петров"
+      }
+    ]
+  }
+]
