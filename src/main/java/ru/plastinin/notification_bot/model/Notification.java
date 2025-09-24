@@ -15,9 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Notification {
 
-    @JsonProperty("typeNotify")
-    String type;
-
     @JsonProperty("dateNotify")
     LocalDate dateNotify;
 
@@ -34,5 +31,6 @@ public class Notification {
     String textNotify;
 
     @JsonProperty("users")
-    List<User> users;
+    List<Long> users;
+
 }

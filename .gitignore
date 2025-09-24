@@ -33,3 +33,7 @@ build/
 .vscode/
 
 application-dev.properties
+userlist.json
+data.json
+birthdays.json
+events.json
