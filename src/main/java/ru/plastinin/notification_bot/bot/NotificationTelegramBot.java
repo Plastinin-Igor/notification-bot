@@ -33,9 +33,11 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         Long chatId = update.getMessage().getChatId();
-        String userName = update.getMessage().getChat().getUserName();
         String message = update.getMessage().getText();
         Message msg = update.getMessage();
+        String name = update.getMessage().getChat().getUserName();
+        String firstName = update.getMessage().getChat().getTitle();
+        String userName = name != null ? name : firstName;
 
         // Проверим, что пользователь есть в списке
         // Если отсутствует, то дальнейшие действия запрещены
@@ -96,9 +98,18 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
 
     private void startCommand(Long chatId, String userName) {
         String text = """
-                @%s, добро пожаловать в бот!
+                %s, добро пожаловать в бот!
                 
-                Команды:
+                Я умею отправлять в группу заранее настроенные уведомления:
+                
+                Например:
+                 - Сегодня День рождения у бабушки 🥳
+                 - Скоро начнется урок 🎓
+                 - Пора собираться на занятия ✏️📐
+                 - Не забудьте принять витамины 💊
+                
+                
+               
                 Начало работы 🚀 /start
                 Справка 🔍 /help
                 """;
@@ -109,9 +120,21 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
     private void helpCommand(Long chatId, String userName) {
         String text = """
                 Телеграм-бот направляет пользователям уведомления.
+                
+                
+                
                 Команды:
-                Начало работы 🚀 /start
-                Справка 🔍 /help
+                
+                - Начало работы 🚀 /start
+                
+                - Справка 🔍 /help
+                
+                - Список всех уведомлений 📝 /list
+                
+                - Список напоминаний 🔔 /event
+                
+                - Список дней рождений 🗓 /day
+                
                 """;
         sendMessage(chatId, text);
     }

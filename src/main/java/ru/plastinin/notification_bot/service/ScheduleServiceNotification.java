@@ -11,8 +11,12 @@ import ru.plastinin.notification_bot.bot.NotificationTelegramBot;
 import ru.plastinin.notification_bot.model.Notification;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -22,9 +26,11 @@ public class ScheduleServiceNotification {
 
     private List<Notification> eventsList;
     private List<Notification> birthdaysList;
+    private final Map<Notification, LocalDate> historyNotification;
 
     public ScheduleServiceNotification(NotificationTelegramBot telegramBot) {
         this.telegramBot = telegramBot;
+        this.historyNotification = new HashMap<>();
     }
 
 
@@ -53,21 +59,66 @@ public class ScheduleServiceNotification {
      */
     @Scheduled(cron = "*/60 * * * * ?")
     public void checkAndSendNotifications() {
+
+        // События
         for (Notification notification : eventsList) {
-            sendNotification(notification);
+            if (isTimeToSend(notification)) {
+                sendNotification(notification);
+            }
+        }
+        // Дни рождения и памятные даты
+        for (Notification notification : birthdaysList) {
+            if (isTimeToSend(notification)) {
+                sendNotification(notification);
+            }
         }
     }
 
+    /**
+     * Метод определяет, наступило ли время отправить сообщение
+     * @return boolean
+     */
     private boolean isTimeToSend(Notification notification) {
-        return true;
+        LocalDateTime localDate = LocalDateTime.now();
+
+        if (notification.getDayOfWeekNotify() != null) {
+            // Если задан день недели, то проверяем точное время и дату и направляем уведомление
+            return notification.getDayOfWeekNotify().equals(localDate.getDayOfWeek()) &&
+                   notification.getTimeNotify().getHour() == localDate.getHour() &&
+                   notification.getTimeNotify().getMinute() == localDate.getMinute();
+        } else {
+            // Если день недели не задан, то проверяем дату и если время после 10:00
+            // и сообщение не направлялось, то направляем сообщение. Так мы гарантируем, что если
+            // сервис не работал, то сообщение все равно будет отправлено.
+            return notification.getDateNotify().getDayOfMonth() == localDate.getDayOfMonth() &&
+                   localDate.getHour() >= 10 && isNotificationWasNotSent(notification);
+        }
     }
 
+    /**
+     * Метод определяет, направлялось ли сегодня данное сообщение или нет
+     */
+    private boolean isNotificationWasNotSent(Notification notification) {
+        LocalDate today = LocalDate.now();
+        if (historyNotification.containsKey(notification)) {
+            return !historyNotification.get(notification).equals(today);
+        } else {
+            return true;
+        }
+    }
 
+    /**
+     * Отправка сообщения в бот
+     */
     private void sendNotification(Notification notification) {
         for (Long userId : notification.getUsers()) {
             telegramBot.sendMessage(userId, notification.getTextNotify());
             log.info("Message {} sent to userId {}", notification.getNameNotify(), notification.getUsers());
         }
+        // Запишем дату и сообщение в карту
+        historyNotification.put(notification, LocalDate.now());
     }
+
+
 }
 
