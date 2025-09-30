@@ -83,7 +83,9 @@ public class ServiceNotificationBot {
         for (Notification event : eventsList) {
             stringBuilder
                     .append(dayOfWeekStringMap.get(event.getDayOfWeekNotify()))
-                    .append(": ")
+                    .append(" ")
+                    .append(event.getTimeNotify())
+                    .append(" - ")
                     .append(event.getNameNotify())
                     .append("\n");
         }
