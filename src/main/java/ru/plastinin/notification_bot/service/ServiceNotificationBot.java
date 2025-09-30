@@ -9,9 +9,10 @@ import ru.plastinin.notification_bot.model.Notification;
 import ru.plastinin.notification_bot.model.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -20,7 +21,15 @@ public class ServiceNotificationBot {
     private final List<User> usersList;
     private final List<Notification> eventsList;
     private final List<Notification> birthdaysList;
+    private final Map<DayOfWeek, String> dayOfWeekStringMap;
 
+    // Сортировка списков по дате (исключая год) и дню недели
+    Comparator<Notification> byMonthAndDay = Comparator.comparing(notification ->
+            notification.getDateNotify().withYear(LocalDate.now().getYear()));
+    Comparator<Notification> byDayOfWeek = Comparator.comparing(Notification::getDayOfWeekNotify);
+
+    // Формат даты
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     public ServiceNotificationBot() {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
@@ -42,6 +51,14 @@ public class ServiceNotificationBot {
             throw new RuntimeException(ex);
         }
 
+        dayOfWeekStringMap = new HashMap<>();
+        dayOfWeekStringMap.put(DayOfWeek.MONDAY, "Понедельник");
+        dayOfWeekStringMap.put(DayOfWeek.TUESDAY, "Вторник");
+        dayOfWeekStringMap.put(DayOfWeek.WEDNESDAY, "Среда");
+        dayOfWeekStringMap.put(DayOfWeek.THURSDAY, "Четверг");
+        dayOfWeekStringMap.put(DayOfWeek.FRIDAY, "Пятница");
+        dayOfWeekStringMap.put(DayOfWeek.SATURDAY, "Суббота");
+        dayOfWeekStringMap.put(DayOfWeek.SUNDAY, "Воскресение");
     }
 
     /**
@@ -61,9 +78,14 @@ public class ServiceNotificationBot {
      * @return List
      */
     public String getAllEvents() {
-        StringBuilder stringBuilder = new StringBuilder("События:\n");
-        for (Notification n : eventsList) {
-            stringBuilder.append(n.getNameNotify()).append("\n");
+        StringBuilder stringBuilder = new StringBuilder("Еженедельные события:\n\n");
+        eventsList.sort(byDayOfWeek);
+        for (Notification event : eventsList) {
+            stringBuilder
+                    .append(dayOfWeekStringMap.get(event.getDayOfWeekNotify()))
+                    .append(": ")
+                    .append(event.getNameNotify())
+                    .append("\n");
         }
         return stringBuilder.toString();
     }
@@ -73,9 +95,13 @@ public class ServiceNotificationBot {
      * @return List
      */
     public String getAllBirthdays() {
-        StringBuilder stringBuilder = new StringBuilder("Поздравления:\n");
-        for (Notification n : birthdaysList) {
-            stringBuilder.append(n.getNameNotify()).append("\n");
+        StringBuilder stringBuilder = new StringBuilder("Поздравления и памятные даты:\n\n");
+        birthdaysList.sort(byMonthAndDay); // Сортировка по дню и месяцу исключая год
+        for (Notification days : birthdaysList) {
+            stringBuilder
+                    .append(days.getDateNotify().format(formatter))
+                    .append(" ")
+                    .append(days.getNameNotify()).append("\n");
         }
         return stringBuilder.toString();
     }

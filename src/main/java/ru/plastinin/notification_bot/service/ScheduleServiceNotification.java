@@ -55,7 +55,7 @@ public class ScheduleServiceNotification {
 
 
     /**
-     * Запускаем проверку каждые 1 минуту.
+     * Запускаем проверку каждую 1 минуту.
      */
     @Scheduled(cron = "*/60 * * * * ?")
     public void checkAndSendNotifications() {
@@ -82,14 +82,13 @@ public class ScheduleServiceNotification {
         LocalDateTime localDate = LocalDateTime.now();
 
         if (notification.getDayOfWeekNotify() != null) {
-            // Если задан день недели, то проверяем точное время и дату и направляем уведомление
+            // Если задан день недели, то проверяем его и точное время и направляем уведомление
             return notification.getDayOfWeekNotify().equals(localDate.getDayOfWeek()) &&
                    notification.getTimeNotify().getHour() == localDate.getHour() &&
                    notification.getTimeNotify().getMinute() == localDate.getMinute();
         } else {
-            // Если день недели не задан, то проверяем дату и если время после 10:00
-            // и сообщение не направлялось, то направляем сообщение. Так мы гарантируем, что если
-            // сервис не работал, то сообщение все равно будет отправлено.
+            // Если день недели не задан, то проверяем дату и если дата совпадает и время после 10:00
+            // и сообщение не направлялось, то направляем сообщение.
             return notification.getDateNotify().getDayOfMonth() == localDate.getDayOfMonth() &&
                    localDate.getHour() >= 10 && isNotificationWasNotSent(notification);
         }
@@ -118,7 +117,6 @@ public class ScheduleServiceNotification {
         // Запишем дату и сообщение в карту
         historyNotification.put(notification, LocalDate.now());
     }
-
 
 }
 

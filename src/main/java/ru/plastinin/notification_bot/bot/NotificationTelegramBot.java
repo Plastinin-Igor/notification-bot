@@ -23,6 +23,10 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
 
     private static final String START = "/start";
     private static final String HELP = "/help";
+    private static final String EVENT = "/event";
+    private static final String DAY = "/day";
+    private static final String LIST = "/list";
+
     private static final String DEBUG = "/debug";
 
     public NotificationTelegramBot(@Value("${bot.token}") String botToken) {
@@ -59,15 +63,26 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
                 log.info("START from username: {}, chatId: {}.", userName, chatId);
             }
             case HELP -> {
-                helpCommand(chatId, userName);
+                helpCommand(chatId);
                 log.info("HELP from username: {}, chatId: {}.", userName, chatId);
             }
+            case EVENT -> {
+                sendMessage(chatId, service.getAllEvents());
+                log.info("EVENT from username: {}, chatId: {}.", userName, chatId);
+            }
+            case DAY -> {
+                sendMessage(chatId, service.getAllBirthdays());
+                log.info("DAY from username: {}, chatId: {}.", userName, chatId);
+            }
+            case LIST -> {
+                sendMessage(chatId, service.getAllEvents());
+                sendMessage(chatId, service.getAllBirthdays());
+                log.info("LIST from username: {}, chatId: {}.", userName, chatId);
+            }
             case DEBUG -> {
-
                 sendMessage(chatId, service.getAllUsers());
                 sendMessage(chatId, service.getAllEvents());
                 sendMessage(chatId, service.getAllBirthdays());
-
                 log.info("DEBUG from username: {}, chatId: {}.", userName, chatId);
             }
             default -> {
@@ -109,7 +124,7 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
                  - Не забудьте принять витамины 💊
                 
                 
-               
+                
                 Начало работы 🚀 /start
                 Справка 🔍 /help
                 """;
@@ -117,7 +132,7 @@ public class NotificationTelegramBot extends TelegramLongPollingBot {
         sendMessage(chatId, formatedText);
     }
 
-    private void helpCommand(Long chatId, String userName) {
+    private void helpCommand(Long chatId) {
         String text = """
                 Телеграм-бот направляет пользователям уведомления.
                 
