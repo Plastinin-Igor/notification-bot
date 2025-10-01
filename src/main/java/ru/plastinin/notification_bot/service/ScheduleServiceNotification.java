@@ -90,6 +90,7 @@ public class ScheduleServiceNotification {
             // Если день недели не задан, то проверяем дату и если дата совпадает и время после 10:00
             // и сообщение не направлялось, то направляем сообщение.
             return notification.getDateNotify().getDayOfMonth() == localDate.getDayOfMonth() &&
+                   notification.getDateNotify().getMonth() == localDate.getMonth() &&
                    localDate.getHour() >= 10 && isNotificationWasNotSent(notification);
         }
     }
